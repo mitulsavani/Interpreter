@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_interpreter" default="compile.module.interpreter">
+  <dirname property="module.interpreter.basedir" file="${ant.file.module_interpreter}"/>
+  
+  <property name="module.jdk.home.interpreter" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.interpreter" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.interpreter" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.interpreter" value="-encoding UTF-8 -source 9 -target 9 ${compiler.args}"/>
+  
+  <property name="interpreter.output.dir" value="${module.interpreter.basedir}/out/production/Interpreter"/>
+  <property name="interpreter.testoutput.dir" value="${module.interpreter.basedir}/out/test/Interpreter"/>
+  
+  <path id="interpreter.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="interpreter.module.production.classpath">
+    <path refid="${module.jdk.classpath.interpreter}"/>
+  </path>
+  
+  <path id="interpreter.runtime.production.module.classpath">
+    <pathelement location="${interpreter.output.dir}"/>
+  </path>
+  
+  <path id="interpreter.module.classpath">
+    <path refid="${module.jdk.classpath.interpreter}"/>
+    <pathelement location="${interpreter.output.dir}"/>
+  </path>
+  
+  <path id="interpreter.runtime.module.classpath">
+    <pathelement location="${interpreter.testoutput.dir}"/>
+    <pathelement location="${interpreter.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.interpreter">
+    <patternset refid="ignored.files"/>
+    <exclude name="out/**"/>
+    <exclude name="out/production/**"/>
+    <exclude name="out/production/Interpreter/**"/>
+    <exclude name="out/production/Interpreter/src/**"/>
+    <exclude name="out/production/Interpreter/src/ByteCode/**"/>
+    <exclude name="out/production/Interpreter/.idea/**"/>
+    <exclude name="out/production/Interpreter/Documentation/**"/>
+    <exclude name="out/production/csc413-p3-interpreter-mitulsavani/**"/>
+    <exclude name="out/production/csc413-p3-interpreter-mitulsavani/src/**"/>
+    <exclude name="out/production/csc413-p3-interpreter-mitulsavani/src/ByteCode/**"/>
+    <exclude name="out/production/csc413-p3-interpreter-mitulsavani/.idea/**"/>
+    <exclude name="out/production/csc413-p3-interpreter-mitulsavani/Documentation/**"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.interpreter">
+    <patternset refid="excluded.from.module.interpreter"/>
+  </patternset>
+  
+  <path id="interpreter.module.sourcepath">
+    <dirset dir="${module.interpreter.basedir}/../../Developer">
+      <include name="Interpreter"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.interpreter" depends="compile.module.interpreter.production,compile.module.interpreter.tests" description="Compile module Interpreter"/>
+  
+  <target name="compile.module.interpreter.production" depends="register.custom.compilers" description="Compile module Interpreter; production classes">
+    <mkdir dir="${interpreter.output.dir}"/>
+    <javac2 destdir="${interpreter.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.interpreter}/javac">
+      <compilerarg line="${compiler.args.interpreter}"/>
+      <bootclasspath refid="interpreter.module.bootclasspath"/>
+      <classpath refid="interpreter.module.production.classpath"/>
+      <src refid="interpreter.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.interpreter"/>
+    </javac2>
+    
+    <copy todir="${interpreter.output.dir}">
+      <fileset dir="${module.interpreter.basedir}">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.interpreter.tests" depends="register.custom.compilers,compile.module.interpreter.production" description="compile module Interpreter; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.interpreter" description="cleanup module">
+    <delete dir="${interpreter.output.dir}"/>
+    <delete dir="${interpreter.testoutput.dir}"/>
+  </target>
+</project>
